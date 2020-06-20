@@ -61,7 +61,7 @@ func (m *MockAlibabaCloudDNSAPI) AddDomainRecord(request *alidns.AddDomainRecord
 		RecordId:   "3",
 		DomainName: request.DomainName,
 		Type:       request.Type,
-		TTL:        ttl,
+		TTL:        int64(ttl),
 		RR:         request.RR,
 		Value:      request.Value,
 	})
@@ -86,7 +86,7 @@ func (m *MockAlibabaCloudDNSAPI) UpdateDomainRecord(request *alidns.UpdateDomain
 	ttl, _ := request.TTL.GetValue()
 	for i := range m.records {
 		if m.records[i].RecordId == request.RecordId {
-			m.records[i].TTL = ttl
+			m.records[i].TTL = int64(ttl)
 		}
 	}
 	response = alidns.CreateUpdateDomainRecordResponse()
@@ -173,7 +173,7 @@ func (m *MockAlibabaCloudPrivateZoneAPI) DeleteZoneRecord(request *pvtz.DeleteZo
 
 	var result []pvtz.Record
 	for _, record := range m.records {
-		if record.RecordId != recordID {
+		if record.RecordId != int64(recordID) {
 			result = append(result, record)
 		}
 	}
@@ -186,7 +186,7 @@ func (m *MockAlibabaCloudPrivateZoneAPI) UpdateZoneRecord(request *pvtz.UpdateZo
 	recordID, _ := request.RecordId.GetValue()
 	ttl, _ := request.Ttl.GetValue()
 	for i := range m.records {
-		if m.records[i].RecordId == recordID {
+		if m.records[i].RecordId == int64(recordID) {
 			m.records[i].Ttl = ttl
 		}
 	}

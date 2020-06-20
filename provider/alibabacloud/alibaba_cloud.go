@@ -426,7 +426,7 @@ func (p *AlibabaCloudProvider) getDomainList() ([]string, error) {
 		for _, tmpDomain := range resp.Domains.Domain {
 			domainNames = append(domainNames, tmpDomain.DomainName)
 		}
-		nextPage := getNextPageNumber(resp.PageNumber, defaultAlibabaCloudPageSize, resp.TotalCount)
+		nextPage := getNextPageNumber(int(resp.PageNumber), defaultAlibabaCloudPageSize, int(resp.TotalCount))
 		if nextPage == 0 {
 			break
 		} else {
@@ -466,7 +466,7 @@ func (p *AlibabaCloudProvider) getDomainRecords(domainName string) ([]alidns.Rec
 			//TODO filter Locked record
 			results = append(results, record)
 		}
-		nextPage := getNextPageNumber(response.PageNumber, defaultAlibabaCloudPageSize, response.TotalCount)
+		nextPage := getNextPageNumber(int(response.PageNumber), defaultAlibabaCloudPageSize, int(response.TotalCount))
 		if nextPage == 0 {
 			break
 		} else {
@@ -615,7 +615,7 @@ func (p *AlibabaCloudProvider) equals(record alidns.Record, endpoint *endpoint.E
 		ttl1 = 0
 	}
 
-	ttl2 := int(endpoint.RecordTTL)
+	ttl2 := int64(endpoint.RecordTTL)
 	if ttl2 == defaultAlibabaCloudRecordTTL {
 		ttl2 = 0
 	}
@@ -965,7 +965,7 @@ func (p *AlibabaCloudProvider) deletePrivateZoneRecords(zones map[string]*alibab
 				for _, target := range endpoint.Targets {
 					// Find matched record to delete
 					if value == target {
-						p.deletePrivateZoneRecord(record.RecordId)
+						p.deletePrivateZoneRecord(int(record.RecordId))
 						found = true
 						break
 					}
@@ -1002,7 +1002,7 @@ func (p *AlibabaCloudProvider) applyChangesForPrivateZone(changes *plan.Changes)
 
 func (p *AlibabaCloudProvider) updatePrivateZoneRecord(record pvtz.Record, endpoint *endpoint.Endpoint) error {
 	request := pvtz.CreateUpdateZoneRecordRequest()
-	request.RecordId = requests.NewInteger(record.RecordId)
+	request.RecordId = requests.NewInteger(int(record.RecordId))
 	request.Rr = record.Rr
 	request.Type = record.Type
 	request.Value = record.Value
@@ -1067,7 +1067,7 @@ func (p *AlibabaCloudProvider) updatePrivateZoneRecords(zones map[string]*alibab
 					p.updatePrivateZoneRecord(record, endpoint)
 				}
 			} else {
-				p.deletePrivateZoneRecord(record.RecordId)
+				p.deletePrivateZoneRecord(int(record.RecordId))
 			}
 		}
 		for _, target := range endpoint.Targets {
